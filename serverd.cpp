@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
+#include <fstream>
 #include <iostream>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -107,13 +108,6 @@ void init_server() {
     exit(EXIT_FAILURE);
   }
 
-  int file = open(kFileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC,
-                  S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-  if (file < 0) {
-    std::cerr << "Error opening file" << std::endl;
-    exit(EXIT_FAILURE);
-  }
-
   while (true) {
     struct sockaddr_in client_addr;
     socklen_t client_addr_len = sizeof(client_addr);
@@ -123,6 +117,12 @@ void init_server() {
     if (client_socket < 0) {
       std::cerr << "Error accepting client connection" << std::endl;
       continue;
+    }
+    int file = open(kFileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC,
+                    S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+    if (file < 0) {
+      std::cerr << "Error opening file" << std::endl;
+      exit(EXIT_FAILURE);
     }
 
     handle_client(client_socket, file);
