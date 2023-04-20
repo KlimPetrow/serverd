@@ -4,6 +4,7 @@
 ## Quick start
 ```
 git clone <url>
+cd serverd
 make
 ./serverd
 ```
@@ -14,3 +15,4 @@ cd example
 g++ client.cpp
 ./client 127.0.0.1 8080 example.txt
 ```
+Look in your home repository!
