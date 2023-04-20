@@ -16,8 +16,8 @@
 #define BUFF_SIZE 1024
 #define LOCALHOST "127.0.0.1"
 const int kPort = 8080;
-const std::string kFilePath = std::getenv("HOME");
-const std::string kFileName = kFilePath + "/output.txt";
+const char* kHomeDir = std::getenv("HOME");
+const std::string kFileName = std::string(kHomeDir) + "/output.txt";
 
 void signal_handler(int signum) {
   if (signum == SIGTERM || signum == SIGHUP) {
@@ -108,7 +108,7 @@ void init_server() {
     exit(EXIT_FAILURE);
   }
 
-  int file = open(kFilePath.c_str(), O_WRONLY | O_CREAT | O_TRUNC,
+  int file = open(kFileName.c_str(), O_WRONLY | O_CREAT | O_TRUNC,
                   S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
   if (file < 0) {
     std::cerr << "Error opening file" << std::endl;
