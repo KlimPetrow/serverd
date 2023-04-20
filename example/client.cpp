@@ -1,20 +1,21 @@
-#include <iostream>
-#include <fstream>
-#include <cstring>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <netinet/in.h>
+#include <sys/socket.h>
 #include <unistd.h>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   if (argc != 4) {
-    std::cerr << "Usage: " << argv[0] << " <server-ip> <server-port> <file-path>\n";
+    std::cerr << "Usage: " << argv[0]
+              << " <server-ip> <server-port> <file-path>\n";
     return 1;
   }
 
-  const char* server_ip = argv[1];
+  const char *server_ip = argv[1];
   const uint16_t server_port = std::stoi(argv[2]);
-  const char* file_path = argv[3];
+  const char *file_path = argv[3];
 
   // Открываем файл для чтения
   std::ifstream input_file(file_path, std::ios::binary | std::ios::ate);
@@ -41,21 +42,15 @@ int main(int argc, char* argv[]) {
   serv_addr.sin_addr.s_addr = inet_addr(server_ip);
   serv_addr.sin_port = htons(server_port);
 
-  if (connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+  if (connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
     std::cerr << "Failed to connect to server\n";
-    close(sockfd);
-    return 1;
-  }
-
-  // Отправляем размер файла
-  if (send(sockfd, &file_size, sizeof(file_size), 0) != sizeof(file_size)) {
-    std::cerr << "Failed to send file size\n";
     close(sockfd);
     return 1;
   }
 
   // Отправляем содержимое файла
   char buffer[1024];
+  memset(buffer, 0, 1024);
   while (input_file.good()) {
     input_file.read(buffer, sizeof(buffer));
     ssize_t bytes_sent = send(sockfd, buffer, input_file.gcount(), 0);
