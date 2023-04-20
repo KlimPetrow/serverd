@@ -65,14 +65,14 @@ void demonize() {
   open("/dev/null", O_WRONLY);
 }
 
-void handle_client(int client_socket){
-  int file;
+void handle_client(int client_socket, int file) {
   char buffer[BUFF_SIZE];
-    int bytes_received;
-    while ((bytes_received = recv(client_socket, buffer, sizeof(buffer), 0)) > 0) {
-        write(file, buffer, bytes_received);
-    }
-    close(client_socket);
+  int bytes_received;
+  while ((bytes_received = recv(client_socket, buffer, sizeof(buffer), 0)) >
+         0) {
+    write(file, buffer, bytes_received);
+  }
+  close(client_socket);
 }
 
 void init_server() {
@@ -105,6 +105,13 @@ void init_server() {
     exit(EXIT_FAILURE);
   }
 
+  int file = open(kFilePath.c_str(), O_WRONLY | O_CREAT | O_TRUNC,
+                  S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+  if (file < 0) {
+    std::cerr << "Error opening file" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
   while (true) {
     struct sockaddr_in client_addr;
     socklen_t client_addr_len = sizeof(client_addr);
@@ -116,7 +123,7 @@ void init_server() {
       continue;
     }
 
-    handle_client(client_socket);
+    handle_client(client_socket, file);
   }
 }
 

@@ -6,5 +6,5 @@ void demonize();
 
 void signal_handler(int);
 
-void handle_client(int);
+void handle_client(int, int);
 
