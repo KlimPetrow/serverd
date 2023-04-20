@@ -1,6 +1,7 @@
 #include "serverd.h"
 
 #include <arpa/inet.h>
+#include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
 #include <iostream>
@@ -13,13 +14,15 @@
 #include <unistd.h>
 
 #define BUFF_SIZE 1024
+#define LOCALHOST "127.0.0.1"
 const int kPort = 8080;
-const std::string kFilePath = "output.txt";
+const std::string kFilePath = std::getenv("HOME");
+const std::string kFileName = kFilePath + "/output.txt";
 
 void signal_handler(int signum) {
   if (signum == SIGTERM || signum == SIGHUP) {
     // Удаляем файл и закрываем все открытые дескрипторы
-    unlink(kFilePath.c_str());
+    unlink(kFileName.c_str());
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
@@ -90,7 +93,7 @@ void init_server() {
   struct sockaddr_in server_address;
   server_address.sin_family = AF_INET;
   server_address.sin_port = htons(kPort);
-  server_address.sin_addr.s_addr = INADDR_ANY;
+  server_address.sin_addr.s_addr = inet_addr(LOCALHOST);
 
   if (bind(server_socket, (struct sockaddr *)&server_address,
            sizeof(server_address)) < 0) {
