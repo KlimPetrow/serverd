@@ -16,17 +16,16 @@
 #define BUFF_SIZE 1024
 #define LOCALHOST "127.0.0.1"
 const int kPort = 8080;
-const char* kHomeDir = std::getenv("HOME");
+const char *kHomeDir = std::getenv("HOME");
 const std::string kFileName = std::string(kHomeDir) + "/output.txt";
 
 void signal_handler(int signum) {
   if (signum == SIGTERM || signum == SIGHUP) {
-    // Удаляем файл и закрываем все открытые дескрипторы
-    unlink(kFileName.c_str());
+    // Закрываем все открытые дескрипторы
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
-    exit(0);
+    exit(EXIT_SUCCESS);
   }
 }
 
@@ -37,24 +36,24 @@ void demonize() {
   // Если не удалось создать новый процесс, выводим ошибку и выходим
   if (pid < 0) {
     std::cerr << "Failed to fork\n";
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   // Если это родительский процесс, завершаем его
   if (pid > 0) {
-    exit(0);
+    exit(EXIT_SUCCESS);
   }
 
   // Создаем новую сессию
   if (setsid() < 0) {
     std::cerr << "Failed to create new session\n";
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   // Изменяем текущий рабочий каталог на корневой
   if (chdir("/") < 0) {
     std::cerr << "Failed to change working directory\n";
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   // Закрываем стандартные потоки ввода/вывода/ошибок
